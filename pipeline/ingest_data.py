@@ -4,6 +4,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 from tqdm.auto import tqdm
+import click
 
 dtype = {
     "VendorID": "Int64",
@@ -30,19 +31,17 @@ parse_dates = [
 ]
 
 
-def run():    
-    
-    pg_user = 'root'
-    pg_pass = 'root'
-    pg_host = 'localhost'
-    pg_db = 'ny_taxi'
-    pg_port = 5432
-
-    year = 2021
-    month = 1
-
-    target_table = 'yellow_taxi_data'
-    chunksize = 100000
+def run(
+    pg_user: str,
+    pg_pass: str,
+    pg_host: str,
+    pg_db: str,
+    pg_port: int,
+    year: int,
+    month: int,
+    target_table: str,
+    chunksize: int,
+):
 
     engine = create_engine(f'postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
 
@@ -75,8 +74,23 @@ def run():
         )
 
 
+@click.command()
+@click.option('--pg-user', default='root', show_default=True, help='Postgres user')
+@click.option('--pg-pass', default='root', show_default=True, help='Postgres password')
+@click.option('--pg-host', default='localhost', show_default=True, help='Postgres host')
+@click.option('--pg-db', default='ny_taxi', show_default=True, help='Postgres database')
+@click.option('--pg-port', default=5432, show_default=True, type=int, help='Postgres port')
+@click.option('--year', default=2021, show_default=True, type=int, help='Year of data')
+@click.option('--month', default=1, show_default=True, type=click.IntRange(1, 12), help='Month of data (1-12)')
+@click.option('--target-table', default='yellow_taxi_data', show_default=True, help='Target table name')
+@click.option('--chunksize', default=100000, show_default=True, type=int, help='CSV read chunksize')
+def main(pg_user, pg_pass, pg_host, pg_db, pg_port, year, month, target_table, chunksize):
+    """CLI entrypoint which calls run() with provided options."""
+    run(pg_user, pg_pass, pg_host, pg_db, pg_port, year, month, target_table, chunksize)
+
+
 if __name__ == '__main__':
-    run()
+    main()
 
 # In[19]:
 
