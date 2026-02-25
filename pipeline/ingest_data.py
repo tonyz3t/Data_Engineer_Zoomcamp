@@ -90,7 +90,7 @@ def main(pg_user, pg_pass, pg_host, pg_db, pg_port, year, month, target_table, c
 
 
 if __name__ == '__main__':
-    main()
+    run()
 
 # In[19]:
 
